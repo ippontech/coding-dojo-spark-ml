@@ -23,8 +23,8 @@ object Main {
       .option("inferSchema", "true")
       .load("src/main/resources/bank-sample.csv")
 
-    println(FeatureEngineering.mostFrequentCat(df))
-    println(FeatureEngineering.means(df))
+    println(FeatureEngineering.getMostFrequentCats(df))
+    println(FeatureEngineering.getMeans(df))
 
     // feature engineering
 
