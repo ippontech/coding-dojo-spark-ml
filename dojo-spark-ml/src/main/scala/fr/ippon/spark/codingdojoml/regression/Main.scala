@@ -25,6 +25,7 @@ object Main {
 
     println(FeatureEngineering.getMostFrequentCats(df))
     println(FeatureEngineering.getMeans(df))
+    //FeatureEngineering.fillNas(df).show()
 
     // feature engineering
 
