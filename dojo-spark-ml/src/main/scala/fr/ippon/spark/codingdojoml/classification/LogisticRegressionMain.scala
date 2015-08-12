@@ -15,7 +15,7 @@ object LogisticRegressionMain {
 
   def main(args: Array[String]) {
     val conf = new SparkConf()
-      .setAppName("Spark coding dojo classification")
+      .setAppName("Spark coding dojo classification with LogisticRegression")
       .setMaster("local[*]")
 
     val sc = new SparkContext(conf)
@@ -35,29 +35,25 @@ object LogisticRegressionMain {
     df.show(10)
 
     // feature engineering
-
+    val dfJobIndexed = new StringIndexer().setInputCol("job").setOutputCol("jobIndex").fit(df).transform(df)
+    val dfMaritalIndexed = new StringIndexer().setInputCol("marital").setOutputCol("maritalIndex").fit(dfJobIndexed).transform(dfJobIndexed)
+    val dfEducationIndexer = new StringIndexer().setInputCol("education").setOutputCol("educationIndex").fit(dfMaritalIndexed).transform(dfMaritalIndexed)
+    val dfDefaultIndexer = new StringIndexer().setInputCol("default").setOutputCol("defaultIndex").fit(dfEducationIndexer).transform(dfEducationIndexer)
+    val dfHousingIndexer = new StringIndexer().setInputCol("housing").setOutputCol("housingIndex").fit(dfDefaultIndexer).transform(dfDefaultIndexer)
+    val dfLoanIndexer = new StringIndexer().setInputCol("loan").setOutputCol("loanIndex").fit(dfHousingIndexer).transform(dfHousingIndexer)
+    val dfYIndexer = new StringIndexer().setInputCol("y").setOutputCol("label").fit(dfLoanIndexer).transform(dfLoanIndexer)
 
     // machine learning
     // We separate our data : trainSet = 75% of our data, validationSet = 25% of our data
-    val Array(trainSet, validationSet) = df.randomSplit(Array(0.75, 0.25))
+    val Array(trainSet, validationSet) = dfYIndexer.randomSplit(Array(0.75, 0.25))
 
     // Pipeline
-    val jobIndexer = new StringIndexer().setInputCol("job").setOutputCol("jobIndex")
-    val maritalIndexer = new StringIndexer().setInputCol("marital").setOutputCol("maritalIndex")
-    val housingIndexer = new StringIndexer().setInputCol("housing").setOutputCol("housingIndex")
-    val loanIndexer = new StringIndexer().setInputCol("loan").setOutputCol("loanIndex")
-    val yIndexer = new StringIndexer().setInputCol("y").setOutputCol("label")
     val vectorAssembler = new VectorAssembler()
-      .setInputCols(Array("age", "jobIndex", "maritalIndex", "housingIndex", "loanIndex", "duration"))
+      .setInputCols(Array("age", "jobIndex", "maritalIndex", "educationIndex", "defaultIndex", "housingIndex", "loanIndex", "duration"))
       .setOutputCol("features")
     val logisticRegression = new LogisticRegression()
 
     val pipeline = new Pipeline().setStages(Array(
-      jobIndexer,
-      maritalIndexer,
-      housingIndexer,
-      loanIndexer,
-      yIndexer,
       vectorAssembler,
       logisticRegression
     ))
