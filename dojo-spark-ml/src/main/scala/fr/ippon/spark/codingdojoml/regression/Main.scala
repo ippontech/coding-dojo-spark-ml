@@ -2,8 +2,7 @@ package fr.ippon.spark.codingdojoml.regression
 
 import fr.ippon.spark.codingdojoml.utils.FeatureEngineering
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * User: mmenestret
