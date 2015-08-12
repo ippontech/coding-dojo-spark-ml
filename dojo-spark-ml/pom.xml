@@ -84,7 +84,7 @@
 
         <dependency>
             <groupId>com.databricks</groupId>
-            <artifactId>spark-csv_2.10</artifactId>
+            <artifactId>spark-csv_${scala.dep.version}</artifactId>
             <version>${spark-csv.version}</version>
         </dependency>
 
