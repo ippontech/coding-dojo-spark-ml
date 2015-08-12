@@ -148,13 +148,6 @@
             <dependencies>
 
                 <dependency>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-client</artifactId>
-                    <version>${hadoop.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
                     <groupId>org.apache.spark</groupId>
                     <artifactId>spark-core_${scala.dep.version}</artifactId>
                     <version>${spark.version}</version>
