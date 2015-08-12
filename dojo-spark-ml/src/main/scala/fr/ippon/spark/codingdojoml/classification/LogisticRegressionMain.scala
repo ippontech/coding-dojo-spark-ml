@@ -1,12 +1,17 @@
 package fr.ippon.spark.codingdojoml.classification
 
+import java.sql.Date
+
 import org.apache.spark.ml.{PipelineModel, Pipeline}
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
 import org.apache.spark.ml.feature.{StringIndexer, VectorAssembler}
 import org.apache.spark.ml.tuning.{ParamGridBuilder, CrossValidator}
 import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.{SparkConf, SparkContext}
+import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
+import org.joda.time.{Years, Period, DateTime}
 
 /**
  * User: ludochane
@@ -26,16 +31,23 @@ object LogisticRegressionMain {
       .option("header", "true")
       .option("delimiter", ";")
       .option("inferSchema", "true")
-      .load("src/main/resources/classification/bank-full.csv")
+      .load("src/main/resources/classification/bank-full-birthdate.csv")
 
-    // printSchema
     df.printSchema()
-
-    // show sample data
     df.show(10)
 
     // feature engineering
-    val dfJobIndexed = new StringIndexer().setInputCol("job").setOutputCol("jobIndex").fit(df).transform(df)
+    // Calculate age from birthdate
+    import org.apache.spark.sql.functions._
+    val now = new DateTime()
+    val birthToAge: (String) => Int = birthDate => {
+      val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
+      Years.yearsBetween(formatter.parseDateTime(birthDate), now).getYears
+    }
+    val dfAge = df.withColumn("age", callUDF(birthToAge, IntegerType, df("birth_date")))
+
+    // Use StringIndexer to convert String columns to Double columns
+    val dfJobIndexed = new StringIndexer().setInputCol("job").setOutputCol("jobIndex").fit(dfAge).transform(dfAge)
     val dfMaritalIndexed = new StringIndexer().setInputCol("marital").setOutputCol("maritalIndex").fit(dfJobIndexed).transform(dfJobIndexed)
     val dfEducationIndexer = new StringIndexer().setInputCol("education").setOutputCol("educationIndex").fit(dfMaritalIndexed).transform(dfMaritalIndexed)
     val dfDefaultIndexer = new StringIndexer().setInputCol("default").setOutputCol("defaultIndex").fit(dfEducationIndexer).transform(dfEducationIndexer)
