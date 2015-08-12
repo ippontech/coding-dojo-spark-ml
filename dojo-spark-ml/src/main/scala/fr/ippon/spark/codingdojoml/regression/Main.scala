@@ -20,9 +20,11 @@ object Main {
     val df = sqlContext.read.format("com.databricks.spark.csv")
       .option("header", "true")
       .option("delimiter", ";")
+      .option("inferSchema", "true")
       .load("src/main/resources/bank-sample.csv")
 
-    print(FeatureEngineering.mostFrequentCat(df))
+    println(FeatureEngineering.mostFrequentCat(df))
+    println(FeatureEngineering.means(df))
 
     // feature engineering
 
