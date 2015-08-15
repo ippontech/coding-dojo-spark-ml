@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      p {
+        margin-top: 2em;
+      }
+      li {
+        margin-top: 1em;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Machine Learning
+
+---
+
+# Machine Learning
+
+Learn from existing data &#8594; model
+
+Apply the model on new data
+
+Categories:
+
+- Supervised learning
+- Unsupervised learning
+- Recommendation
+
+---
+
+# Supervised learning
+
+Training data = Features + Label
+
+Predict the label on new data
+
+**Classification:** label = class
+
+- E.g. classifiy mails: spam / non-spam
+
+**Regression:** label = continuous variable
+
+- E.g. price for a second hand car
+
+---
+
+# Unsupervised learning
+
+Training data = Features
+
+Build clusters of points based on similarities
+
+**Clustering:** classify into clusters
+
+- E.g. find groups of similar people
+
+---
+
+# Workflow
+
+1. Data Cleansing
+1. Feature Engineering
+1. Train a Machine Learning model
+  1. Split the dataset: training/validation/test datasets
+  1. Train the model
+1. Apply the model on new data
+
+---
+
+# Data Cleansing
+
+- Convert strings to numbers / booleans / ...
+- Parse dates
+- Handle missing values
+- Handle data in an incorrect format
+- ...
+
+---
+
+# Feature Engineering
+
+- Transform data into numerical features
+- E.g.:
+  - A birth date → age
+  - Dates of phone calls → Number of calls
+  - Text → Vector of words
+  - 2 names → Levensthein distance
+
+<img src="img/features_engineering.png" width="700">
+
+---
+
+# Machine Learning
+
+<img src="img/ml_model.png" width="250" style="float:right">
+
+- Train a model
+- Test an algorithm with different params
+  - Cross validation (Grid Search)
+- Compare different algorithms, e.g.:
+  - Logistic regression
+  - Gradient boosting trees
+  - Random forest
+
+---
+
+# Machine Learning
+
+- Evaluate the performance of the model
+  - E.g.: ROC curve
+- Examine predictions
+  - False positives, false negatives...
+
+<img src="img/roc_curve.png" width="250"> <img src="img/predictions.png" width="250">
+
+---
+
+class: center, middle
+
+# Lab 1 - Regression
+
+---
+
+class: center, middle
+
+# Lab 2 - Classification
+
+---
+
+class: center, middle
+
+# Lab 3 - Cross Validation
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
