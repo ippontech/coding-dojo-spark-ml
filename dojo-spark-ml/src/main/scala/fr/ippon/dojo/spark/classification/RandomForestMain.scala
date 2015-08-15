@@ -1,4 +1,4 @@
-package fr.ippon.spark.codingdojoml.classification
+package fr.ippon.dojo.spark.classification
 
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.RandomForestClassifier

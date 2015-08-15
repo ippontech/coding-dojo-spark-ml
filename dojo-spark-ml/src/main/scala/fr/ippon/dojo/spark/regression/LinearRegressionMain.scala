@@ -1,6 +1,6 @@
-package fr.ippon.spark.codingdojoml.regression
+package fr.ippon.dojo.spark.regression
 
-import fr.ippon.spark.codingdojoml.utils.FeatureEngineering
+import fr.ippon.dojo.spark.utils.FeatureEngineering
 import org.apache.spark.ml.regression.{GBTRegressor, LinearRegression}
 import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.tuning.{ParamGridBuilder, CrossValidator}
@@ -10,7 +10,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 /**
  * User: mmenestret
  */
-object Main {
+object LinearRegressionMain {
   val conf = new SparkConf()
     .setAppName("Spark coding dojo regression")
     .setMaster("local[*]")

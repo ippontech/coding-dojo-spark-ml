@@ -1,6 +1,7 @@
-package fr.ippon.spark.codingdojoml.dataExploration.sql
+package fr.ippon.dojo.spark.exploration.dataframes
 
 import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -28,7 +29,6 @@ object WikipediaWorldcup extends App {
 
   views.printSchema()
   views.show()
-  views.registerTempTable("views")
 
 
   val pagesSchema = StructType(Array(
@@ -45,17 +45,16 @@ object WikipediaWorldcup extends App {
 
   pages.printSchema()
   pages.show()
-  pages.registerTempTable("pages")
 
 
-  val res = sqlContext.sql(
-    """select language, pagename, sum(views) as v
-      |from views
-      |join pages on views.site = pages.site and views.url = pages.url
-      |group by language, pagename
-      |order by v desc
-    """.stripMargin)
+  val join = views.join(pages, views("site") === pages("site") && views("url") === pages("url"))
 
-  res.show()
+  val agg = join.select("language", "pagename", "views")
+    .groupBy("language", "pagename")
+    .agg(sum("views"))
+
+  val sort = agg.sort(agg("SUM(views)").desc)
+
+  sort.show()
 
 }

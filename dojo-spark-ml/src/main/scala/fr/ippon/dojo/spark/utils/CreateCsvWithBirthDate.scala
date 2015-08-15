@@ -1,4 +1,4 @@
-package fr.ippon.spark.codingdojoml.utils
+package fr.ippon.dojo.spark.utils
 
 import java.sql.Date
 

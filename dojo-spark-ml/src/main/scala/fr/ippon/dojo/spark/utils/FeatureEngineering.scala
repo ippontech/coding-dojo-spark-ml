@@ -1,4 +1,4 @@
-package fr.ippon.spark.codingdojoml.utils
+package fr.ippon.dojo.spark.utils
 
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.sql.DataFrame

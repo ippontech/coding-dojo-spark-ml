@@ -1,4 +1,4 @@
-package fr.ippon.spark.codingdojoml.dataExploration.rdd
+package fr.ippon.dojo.spark.exploration.rdd
 
 import org.apache.spark.{SparkConf, SparkContext}
 

@@ -1,14 +1,14 @@
-package fr.ippon.spark.codingdojoml.dataExploration.dataframes
+package fr.ippon.dojo.spark.exploration.dataframes
 
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.functions._
 import org.apache.spark.{SparkConf, SparkContext}
 
-object AverageAgeByMaritalStatus extends App {
+object ListDistinctJobs extends App {
 
   val conf = new SparkConf()
     .setMaster("local[*]")
-    .setAppName("average-age-by-marital-status")
+    .setAppName("list-distinct-jobs")
   val sc = new SparkContext(conf)
   val sqlContext = new SQLContext(sc)
 
@@ -21,8 +21,9 @@ object AverageAgeByMaritalStatus extends App {
   lines.printSchema()
   lines.show()
 
-  val avgAge = lines.groupBy("marital")
-    .agg(avg("age"))
+  lines.select("job")
+    .sort("job")
+    .distinct
     .show()
 
 }
