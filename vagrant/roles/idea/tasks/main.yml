@@ -1,0 +1,30 @@
+- name: Check that IDEA is installed
+  stat:
+    path={{idea_install_dir}}/bin
+  register: st
+
+- name: Download IDEA
+  get_url:
+    url={{idea_download_url}}
+    dest=/tmp/ideaIC-{{idea_version}}.tar.gz
+    timeout=60
+    validate_certs=no
+  when: not st.stat.exists
+
+- name: Extract IDEA
+  unarchive:
+    src=/tmp/ideaIC-{{idea_version}}.tar.gz
+    copy=no
+    dest=/tmp
+  when: not st.stat.exists
+
+- name: Copy IDEA
+  shell: cp -r /tmp/{{idea_dir}} {{idea_install_dir}} creates={{idea_install_dir}}/bin
+  when: not st.stat.exists
+
+- name: Put a Launcher icon
+  template:
+    src=idea.desktop
+    dest=/home/{{user}}/.local/share/applications
+    owner={{user}}
+    group={{group}}

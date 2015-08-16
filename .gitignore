@@ -19,3 +19,9 @@ project/plugins/project/
 # IDE
 .idea
 *.iml
+
+.vagrant
+/vagrant/roles/azavea.java/
+/vagrant/roles/azavea.spark/
+/vagrant/roles/jgoodall.maven3/
+/vagrant/roles/smola.java/

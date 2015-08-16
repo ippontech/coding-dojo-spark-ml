@@ -1,0 +1,5 @@
+idea_version: 14.1.4
+idea_build_number: 141.1532.4
+idea_dir: idea-IC-{{idea_build_number}}
+idea_install_dir: /home/{{user}}/{{idea_dir}}
+idea_download_url: https://download.jetbrains.com/idea/ideaIC-{{idea_version}}.tar.gz

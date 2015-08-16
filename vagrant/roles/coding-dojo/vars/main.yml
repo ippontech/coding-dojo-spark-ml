@@ -1,0 +1,4 @@
+dojo_home_parent_dir: /home/{{user}}
+dojo_home_dir: "{{dojo_home_parent_dir}}/coding-dojo-spark-ml"
+dojo_pom_dir: "{{dojo_home_parent_dir}}/coding-dojo-spark-ml/dojo-spark-ml"
+dojo_git_url: https://github.com/ippontech/coding-dojo-spark-ml.git

@@ -1,0 +1,22 @@
+- name: Check that Spark is installed
+  stat:
+    path={{spark_dir}}/bin
+  register: st
+
+- name: Download Spark
+  get_url:
+    url={{spark_download_url}}
+    dest=/tmp/spark-{{spark_version}}-bin-hadoop2.6.tgz
+    timeout=60
+  when: not st.stat.exists
+
+- name: Extract Spark
+  unarchive:
+    src=/tmp/spark-{{spark_version}}-bin-hadoop2.6.tgz
+    copy=no
+    dest=/tmp
+  when: not st.stat.exists
+
+- name: Copy Spark
+  shell: cp -r /tmp/spark-{{spark_version}}-bin-hadoop2.6 {{spark_dir}} creates={{spark_dir}}/bin
+  when: not st.stat.exists

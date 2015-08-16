@@ -1,0 +1,15 @@
+- name: Check that the source code is checked out
+  stat:
+    path={{dojo_home_dir}}
+  register: st
+
+- name: Checkout the source code
+  shell: cd {{dojo_home_parent_dir}} && git clone {{dojo_git_url}}
+  when: not st.stat.exists
+
+- name: Update the source code
+  shell: cd {{dojo_home_dir}} && git pull
+  when: st.stat.exists
+
+- name: Download Maven dependencies
+  shell: "cd {{dojo_pom_dir}} && mvn dependency:sources"

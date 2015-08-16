@@ -1,0 +1,5 @@
+---
+
+- name: Install Ubuntu Desktop
+  apt: pkg=ubuntu-desktop state=latest
+  sudo: true
