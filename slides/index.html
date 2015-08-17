@@ -166,7 +166,7 @@ class: center, middle
 
 # Linear Regression
 
-Model the relationship between a variable and explanoratory variables
+- Model the relationship between a **continuous** variable and explanoratory variables
 
 <img src="img/linear_regression_equation.png" width="300">
 
@@ -234,11 +234,18 @@ class: center, middle
 
 - Test each combination of parameters (grid)
 - Return the best-performing model using an evaluator
-  - Root Mean Square error
+
+- Spark MLlib: `ParamGridBuilder`
+
+---
+
+# Evaluation of the error
+
+- Root Mean Square error
 
 <img src="img/rmse.png" width="60%">
 
-- Spark MLlib: `ParamGridBuilder`
+- Spark MLlib: `RegressionEvaluator`
 
 ---
 
@@ -254,7 +261,104 @@ class: center, middle
 
 class: center, middle
 
-# Lab 2 - Classification
+# Lab 2.1 - Classification
+
+## Logistic Regression
+
+---
+
+# Logistic Regression
+
+- Model the relationship between a **binary** variable and explanoratory variables
+
+---
+
+# Use case
+
+Predict whether the person will purchase a subscription ("y") from other characteristics
+
+<img src="img/data_bank.png" width="100%">
+
+---
+
+# Spark ML Pipelines
+
+- Pipeline = Transformers + Estimator
+- Call `pipeline.fit()` to train a model
+
+<img src="img/pipeline_fit.png" width="65%">
+
+- Call `model.fit()` to apply the model
+
+<img src="img/pipeline_transform.png" width="65%">
+
+---
+
+# Lab - `ClassificationMain`
+
+Feature Engineering
+
+- index the "y" column into a "label" column
+- index other features
+- assemble a vector of features
+
+Split the data set:
+
+- training data set: 80%
+- test data set: 20%
+
+Train the algorithm
+
+- Spark MLlib: `LogisticRegression`
+- Test the model
+
+---
+
+class: center, middle
+
+# Lab 2.2 - Grid Search &amp; Cross Validation
+
+## (Optional)
+
+---
+
+# Grid Search
+
+*See Lab 1.3*
+
+---
+
+# Evaluation of the error
+
+- Binary evaluator
+
+- Spark MLlib: `BinaryClassificationEvaluator`
+
+---
+
+# Cross Validation
+
+*See Lab 1.3*
+
+- Spark MLlib: `CrossValidator`
+
+---
+
+class: center, middle
+
+# Lab 2.3 - Random Forests
+
+---
+
+# Random Forests
+
+- Decision tree: fixed set of decisions to make a choice
+- Random forests:
+  - Many decision trees
+  - Each tree uses a random selection of features
+  - Final decision = average of all the decisions
+
+- Spark MLlib: `RandomForestClassifier`
 
     </textarea>
     <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
