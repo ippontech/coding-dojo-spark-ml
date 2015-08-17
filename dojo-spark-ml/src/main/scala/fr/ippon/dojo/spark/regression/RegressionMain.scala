@@ -21,6 +21,7 @@ object RegressionMain {
 
     df.show()
 
+
     //////////////////////////////// Lab 1.1 - Linear Regression
 
     //////// Feature engineering
@@ -32,7 +33,7 @@ object RegressionMain {
 
     //////// Spliting in two dataset: training (80%) and test (20%)
 
-    // - use featureDF.randomSplit()
+    // - use df.randomSplit()
 
 
     //////// Train the model
