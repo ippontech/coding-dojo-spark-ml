@@ -60,6 +60,10 @@ object RegressionMain {
 
     // - set the label column parameter on the algorithm: "age_label"
 
+    // - set the "maxDepth" parameter (e.g. 10)
+
+    // - set the "stepSize" parameter (e.g. 0.01)
+
     // - fit the model on the training dataset: fit()
 
 
@@ -89,8 +93,6 @@ object RegressionMain {
 
     // - set the metric: "rmse"
 
-    // - evaluate the precision: evaluate()
-
 
     //////// Cross Validation
 
@@ -112,6 +114,8 @@ object RegressionMain {
     // - apply the model on the test dataset: transform()
 
     // - compare the predictions with the previous results
+
+    // - evaluate the RMSE precision of each of the 3 algorithms: evaluator.evaluate()
 
   }
 }
