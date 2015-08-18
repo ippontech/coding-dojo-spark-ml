@@ -4,19 +4,15 @@ import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
 
-/**
- * User: ludochane
- */
 object ClassificationMain {
 
+  val conf = new SparkConf()
+    .setAppName("classification")
+    .setMaster("local[*]")
+  val sc = new SparkContext(conf)
+  val sqlContext = new SQLContext(sc)
+
   def main(args: Array[String]) {
-    val conf = new SparkConf()
-      .setAppName("Spark coding dojo classification with LogisticRegression")
-      .setMaster("local[*]")
-
-    val sc = new SparkContext(conf)
-
-    val sqlContext = new SQLContext(sc)
 
     val df = sqlContext.read.format("com.databricks.spark.csv")
       .option("header", "true")
@@ -36,7 +32,7 @@ object ClassificationMain {
 
     //////// Build the pipeline
 
-    // - create Transformers to convert the label column ("y") to a Double column called "label"
+    // - create a Transformer to convert the label column ("y") to a Double column called "label"
     //   class: StringIndexer
 
     // - create Transformers to convert String columns to Double columns
@@ -60,14 +56,6 @@ object ClassificationMain {
 
 
     //////// Train the model
-
-    // - instantiate the algorithm: LogisticRegression
-
-    // - set the label column parameter on the algorithm: "label" (optional as "label" is the default)
-
-    // - set the "regParam" parameter (e.g. 0.1)
-
-    // - set the "maxIter" parameter (e.g. 50)
 
     // - fit the model on the training dataset: fit()
 
