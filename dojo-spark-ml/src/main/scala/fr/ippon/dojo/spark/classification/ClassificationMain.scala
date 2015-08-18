@@ -24,29 +24,28 @@ object ClassificationMain {
 
 
     //////////////////////////////// Lab 2.1 - Logistic Regression
+    println("Lab 2.1 - Logistic Regression")
 
     //////// Feature engineering
 
     // - calculate the age from the birth date: FeatureEngineering.calculateAge()
 
+    // - use a StringIndexer to convert the label column ("y") to a Double column called "label"
+
+    // - use StringIndexers to convert String columns to Double columns
+    //   columns: "job", "marital", "education", "default", "housing", "loan"
+
 
     //////// Build the pipeline
-
-    // - create a Transformer to convert the label column ("y") to a Double column called "label"
-    //   class: StringIndexer
-
-    // - create Transformers to convert String columns to Double columns
-    //   columns: "job", "marital", "education", "default", "housing", "loan", "y"
-    //   class: StringIndexer
 
     // - create a Transformer to transform numeric columns into a vector
     //   columns: "age", "jobIndex", "maritalIndex", "educationIndex", "defaultIndex", "housingIndex", "loanIndex", "duration"
     //   class: VectorAssembler
 
-    // - create an Estimator and set its parameters (regParam, maxIter)
+    // - create an Estimator and set its parameters (regParam=0.1, maxIter=50)
     //   class: LogisticRegression
 
-    // - create a Pipeline and set the stages (StringIndexers, VectorAssembler, LogisticRegression)
+    // - create a Pipeline and set the stages (VectorAssembler, LogisticRegression)
     //   class: Pipeline
 
 
@@ -68,6 +67,7 @@ object ClassificationMain {
 
 
     //////////////////////////////// Lab 2.2 - Grid Search & Cross Validation
+    println("Lab 2.2 - Grid Search & Cross Validation")
 
     //////// Grid Search params
 
@@ -82,8 +82,6 @@ object ClassificationMain {
 
     // - instantiate an evaluator: BinaryClassificationEvaluator
 
-    // - evaluate the precision: evaluate()
-
 
     //////// Cross Validation
 
@@ -95,18 +93,7 @@ object ClassificationMain {
 
     // - set the grid of params
 
-    // - set the evaluator (RMSE)
-
-    // - fit the model on the training dataset: fit()
-
-
-    //////////////////////////////// Lab 2.3 - Random Forests
-
-    //////// Train the model
-
-    // - instantiate the algorithm: RandomForestClassifier
-
-    // - set the label column parameter on the algorithm: "label" (optional as "label" is the default)
+    // - set the evaluator
 
     // - fit the model on the training dataset: fit()
 
@@ -118,5 +105,26 @@ object ClassificationMain {
     // - compare the predictions with the expected results
 
 
+    //////////////////////////////// Lab 2.3 - Random Forests
+    println("Lab 2.3 - Random Forests")
+
+    //////// Build the pipeline
+
+    // - create an Estimator and set its parameters (...)
+    //   class: RandomForestClassifier
+
+    // - create a Pipeline and set the stages (VectorAssembler, RandomForestClassifier)
+    //   class: Pipeline
+
+    //////// Train the model
+
+    // - fit the model on the training dataset: fit()
+
+
+    //////// Apply the model
+
+    // - apply the model on the test dataset: transform()
+
+    // - compare the predictions with the expected results
+
   }
-}
