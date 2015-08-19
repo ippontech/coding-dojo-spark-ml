@@ -19,3 +19,7 @@ project/plugins/project/
 # IDE
 .idea
 *.iml
+
+# We don't want these in the 'solution' branch
+/vagrant/
+/slides/
