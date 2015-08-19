@@ -9,17 +9,18 @@ object CountByJob extends App {
     .setAppName("count-by-job")
   val sc = new SparkContext(conf)
 
-  val lines = sc.textFile("src/main/resources/bank-sample.csv")
+  val lines = sc.textFile("src/main/resources/bank-full.csv")
     .zipWithIndex()
     .filter(x => x._2 != 0)
     .map(x => x._1)
 
-  val ages = lines.map(x => x.split(";"))
-    .map(x => (x(1).stripPrefix("\"").stripSuffix("\""), (x(0).toInt, 1)))
+  val jobs = lines.map(x => x.split(";"))
+    .map(x => (x(1).stripPrefix("\"").stripSuffix("\""), 1))
 
-  val countByJob = ages.reduceByKey((a, b) => (a._1 + b._1, a._2 + b._2))
-    .mapValues(x => x._1 / x._2)
+  val countByJob = jobs.reduceByKey(_ + _)
+    .sortBy(x => -x._2)
+    .collect()
 
-  countByJob.foreach(x => println("Count for job " + x._1 + ": " + x._2))
+  countByJob.foreach(x => println(x._1 + " => " + x._2))
 
 }
