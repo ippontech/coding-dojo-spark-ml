@@ -113,4 +113,15 @@ object FeatureEngineering {
     va.setOutputCol("features")
     va.transform(scaledDF).withColumn("age_label", df("age").cast(DoubleType))
   }
+
+  // Adds
+  def calculateAge(df: DataFrame, birthDateColumn: String): DataFrame = {
+    import org.apache.spark.sql.functions._
+    val now = new DateTime()
+    val birthToAge: (String) => Int = birthDate => {
+      val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
+      Years.yearsBetween(formatter.parseDateTime(birthDate), now).getYears
+    }
+    df.withColumn("age", callUDF(birthToAge, IntegerType, df(birthDateColumn)))
+  }
 }
