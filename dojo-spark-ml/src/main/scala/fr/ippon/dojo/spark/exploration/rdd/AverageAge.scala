@@ -9,7 +9,7 @@ object AverageAge extends App {
     .setAppName("average-age")
   val sc = new SparkContext(conf)
 
-  val lines = sc.textFile("src/main/resources/bank-sample.csv")
+  val lines = sc.textFile("src/main/resources/bank-full.csv")
     .zipWithIndex()
     .filter(x => x._2 != 0)
     .map(x => x._1)
