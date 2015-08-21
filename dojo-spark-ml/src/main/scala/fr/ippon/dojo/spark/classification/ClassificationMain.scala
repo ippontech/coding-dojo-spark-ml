@@ -128,3 +128,4 @@ object ClassificationMain {
     // - compare the predictions with the expected results
 
   }
+}
