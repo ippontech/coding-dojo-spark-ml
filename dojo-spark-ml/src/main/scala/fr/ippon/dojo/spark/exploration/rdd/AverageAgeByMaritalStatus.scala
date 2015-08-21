@@ -9,17 +9,17 @@ object AverageAgeByMaritalStatus extends App {
     .setAppName("average-age-by-marital-status")
   val sc = new SparkContext(conf)
 
-  val lines = sc.textFile("src/main/resources/bank-sample.csv")
-    .zipWithIndex()
-    .filter(x => x._2 != 0)
-    .map(x => x._1)
+  // - load the CSV file ("src/main/resources/bank-full.csv")
+  // val lines = sc...
 
-  val ages = lines.map(x => x.split(";"))
-    .map(x => (x(2).stripPrefix("\"").stripSuffix("\""), (x(0).toInt, 1)))
+  // - skip the header line
 
-  val avgByMaritalStatus = ages.reduceByKey((a, b) => (a._1 + b._1, a._2 + b._2))
-    .mapValues(x => x._1 / x._2)
+  // - extract the marital status column
 
-  avgByMaritalStatus.foreach(x => println("Average age for " + x._1 + "s: " + x._2))
+  // - put the marital statuses in a tuple with, as value, a tuple with the age and a counter initialized at 1
+
+  // - use a reduce-by-key operation to sum and count the ages corresponding to the same keys
+
+  // - print the results
 
 }

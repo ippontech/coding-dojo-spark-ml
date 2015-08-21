@@ -4,9 +4,9 @@
     <title>Hands-On Machine Learning</title>
     <meta charset="utf-8">
     <style>
-      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
-      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
-      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(fonts/css_family_Yanone+Kaffeesatz);
+      @import url(fonts/css_family_Droid+Serif:400,700,400italic);
+      @import url(fonts/css_family_Ubuntu+Mono:400,700,400italic);
 
       body { font-family: 'Droid Serif'; }
       h1, h2, h3 {
@@ -40,6 +40,12 @@
         line-height: 0.8em;
       }
 
+      .full { padding: 1em; }
+      .full h1 {
+        font-size: 30px;
+        margin: 0px 30px;
+      }
+
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
     </style>
   </head>
@@ -48,7 +54,98 @@
 
 class: center, middle, section
 
+# Coding Dojo
+
+# Apache Spark &amp; Open Data
+
+---
+
+# Agenda
+
+- Introduction to Apache Spark
+- RDDs - Resilient Distributed Datasets
+- DataFrames
+- Spark SQL
+- Machine Learning
+- Spark cluster
+
+---
+
 # Spark
+
+- Processing of large volumes of data
+- Distributed processing (commodity hardware)
+- Written in Scala, bindings in Java, Python and R
+
+---
+
+# History
+
+- 2009: AMPLab, Berkeley University
+- June 2013 : "Top-level project" of the Apache foundation
+- May 2014: version 1.0.0
+- Currently: version 1.5.0
+
+---
+
+# Use cases
+
+- Logs analysis
+- Processing of text files
+- Analytics
+- Distributed search (Google, before)
+- Fraud detection
+- Product recommendation
+
+---
+
+# Proximity with Hadoop
+
+- Same use cases
+- Same development model: MapReduce
+- Integration with the ecosystem
+
+---
+
+# Simpler than Hadoop
+
+- API simpler to learn
+- “Relaxed” MapReduce
+- Spark Shell: interactive processing
+
+---
+
+# Faster than Hadoop
+
+Spark officially sets a new record in large-scale sorting (5th November 2014)
+
+- Sorting 100 To of data
+- **Hadoop MR: 72 minutes**
+  - With 2100 nodes (50400 cores)
+- **Spark: 23 minutes**
+  - With 206 nodes (6592 cores)
+
+http://databricks.com/blog/2014/11/05/spark-officially-sets-a-new-record-in-large-scale-sorting.html
+
+---
+
+# Spark ecosystem
+
+- Spark
+- Spark Shell
+- Spark Streaming
+- Spark SQL
+- Spark ML/MLlib
+- GraphX
+
+---
+
+# Integration
+
+- Yarn, Zookeeper, Mesos
+- HDFS
+- Cassandra, Elasticsearch, MongoDB
+- Notebooks: Zeppelin, Spark Notebook...
 
 ---
 
@@ -60,9 +157,156 @@ class: center, middle, section
 
 ---
 
+# RDD
+
+- Resilient Distributed Dataset
+- Abstraction of a collection processed in parallel
+- Fault tolerant
+- Can work with tuples:
+  - Key - Value
+  - Tuples must be independent from each other
+
+---
+
+# Sources
+
+- Files on HDFS
+- Local files
+- Collection in memory
+- Amazon S3
+- NoSQL database
+- ...
+- Or a custom implementation of `InputFormat`
+
+---
+
+# Transformations:
+
+- Applies a transformation to an RDD and returns another RDD
+- Immutable
+- Lazy!
+- Examples:
+ - _map()_: transforms a value into another value
+ - _mapToPair()_: transforms a value into a tuple
+ - _filter()_: filters tuples/values
+ - _groupByKey()_: groups values by keys
+ - _reduceByKey()_: aggregates values with an aggregation function
+ - _join()_, _cogroup()_...: joins RDDs
+
+---
+
+# Actions:
+
+- Final, don't return an RDD
+- Examples:
+ - _count()_: counts values/tuples
+ - _foreach()_: executes a fonction on each value/tuple (useful for debugging purposes)
+ - _saveAsHadoopFile()_: saves results in Hadoop files
+ - _collect()_: returns results as a list
+
+---
+
+# Example
+
+- Trees of Paris: CSV file, Open Data
+- Count of trees by specie
+
+```text
+geom_x_y;circonfere;adresse;hauteurenm;espece;varieteouc;dateplanta
+48.8648454814, 2.3094155344;140.0;COURS ALBERT 1ER;10.0;Aesculus hippocastanum;;
+48.8782668139, 2.29806967519;100.0;PLACE DES TERNES;15.0;Tilia platyphyllos;;
+48.889306184, 2.30400164126;38.0;BOULEVARD MALESHERBES;0.0;Platanus x hispanica;;
+48.8599934405, 2.29504883623;65.0;QUAI BRANLY;10.0;Paulownia tomentosa;;1996-02-29
+...
+```
+
+---
+
+# Example
+
+```java
+JavaSparkContext sc = new JavaSparkContext("local", "arbres");
+
+sc.textFile("data/arbresalignementparis2010.csv")
+        .filter(line -> !line.startsWith("geom"))
+        .map(line -> line.split(";"))
+        .mapToPair(fields -> new Tuple2<String, Integer>(fields[4], 1))
+        .reduceByKey((x, y) -> x + y)
+        .sortByKey()
+        .foreach(t -> System.out.println(t._1 + " : " + t._2));
+```
+
+<img src="img/rdd_example.png" width="100%">
+
+---
+
 class: center, middle, lab
 
-# Lab 1.1 - Compute
+# Lab - Data exploration
+
+---
+
+# The data set
+
+- List of potential clients along with:
+  - some demographics
+  - other characteristics
+  - whether they subscribed a bank product
+- CSV file: `src/main/resources/banking-full.csv`
+
+<img src="img/data_banking.png" width="100%">
+
+---
+
+# 1 - Compute the average age
+
+- Class `fr.ippon.dojo.spark.exploration.rdd.AverageAge`
+- Steps
+  - load the CSV file
+  - skip the header line
+  - split the lines by the ";" char
+  - extract the age and convert the string to int
+  - sum and count the ages, and divide one by the other
+  - print the result
+
+---
+
+# 2 - List distinct jobs
+
+- Class `fr.ippon.dojo.spark.exploration.rdd.ListDistinctJobs`
+- Steps
+  - load the CSV file
+  - skip the header line
+  - extract the job column
+  - put the jobs in a tuple with a dummy value
+  - use a reduce-by-key operation to remove duplicates
+  - print the results
+
+---
+
+# 3 - Count by job
+
+- Class `fr.ippon.dojo.spark.exploration.rdd.CountByJob`
+- Steps
+  - load the CSV file
+  - skip the header line
+  - extract the job column
+  - put the jobs in a tuple with the value 1
+  - use a reduce-by-key operation to sum values corresponding to the same keys
+  - print the results
+
+---
+
+# 4 - Average age by marital status
+
+- Class `fr.ippon.dojo.spark.exploration.rdd.AverageAgeByMaritalStatus`
+- Steps
+  - load the CSV file
+  - skip the header line
+  - extract the marital status column
+  - put the marital statuses in a tuple with, as value, a tuple with the age and a counter initialized at 1
+  - use a reduce-by-key operation to sum and count the ages corresponding to the same keys
+  - print the results
 
 ---
 
@@ -408,7 +652,7 @@ class: center, middle, lab
 - Spark MLlib: `RandomForestClassifier`
 
     </textarea>
-    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    <script src="scripts/remark-latest.min.js" type="text/javascript">
     </script>
     <script>
       var slideshow = remark.create();

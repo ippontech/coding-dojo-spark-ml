@@ -9,16 +9,17 @@ object AverageAge extends App {
     .setAppName("average-age")
   val sc = new SparkContext(conf)
 
-  val lines = sc.textFile("src/main/resources/bank-sample.csv")
-    .zipWithIndex()
-    .filter(x => x._2 != 0)
-    .map(x => x._1)
+  // - load the file ("src/main/resources/bank-full.csv")
+  // val lines = sc....
 
-  val ages = lines.map(x => x.split(";"))
-    .map(x => x(0).toInt)
+  // - skip the first line
 
-  val avg = ages.sum() / ages.count()
+  // - split the lines by the ";" char
 
-  println("Average age: " + avg)
+  // - extract the age and convert the string to int
+
+  // - sum and count the ages, and divide one by the other
+
+  // - print the result
 
 }
