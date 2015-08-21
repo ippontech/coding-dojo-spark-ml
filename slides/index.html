@@ -316,6 +316,251 @@ class: center, middle, section
 
 ---
 
+# DataFrames
+
+- Spark 1.3+
+- Processing of structured data
+- DataFrames ~= RDD + named columns
+- DSL :
+  - `select()`
+  - `where()`
+  - `groupBy()`
+  - `withColumn()`
+  - ...
+
+---
+
+# DataFrames
+
+Prerequisite:
+
+- Have tabular data
+- Describe the schema → DataFrame
+
+Description of the schema:
+
+- Programmatic description of the data
+- Inference through reflection (POJO)
+
+---
+
+# DataFrames - Example
+
+Create tabular data
+
+- Type Row
+
+```java
+JavaRDD<Row> rdd = trees.map(fields -> Row.create(
+        Float.parseFloat(fields[3]), fields[4]));
+```
+
+- Custom type
+
+```java
+JavaRDD<Row> rdd = trees.map(fields -> Row.create(
+        Float.parseFloat(fields[3]), fields[4]));
+```
+
+```text
+---------------------------------------
+|       10.0 | Aesculus hippocastanum |
+|       15.0 | Tilia platyphyllos     |
+|        0.0 | Platanus x hispanica   |
+|       10.0 | Paulownia tomentosa    |
+|        ... | ...                    |
+```
+
+---
+
+# DataFrames - Schema inference
+
+```java
+DataFrame df = sqlContext.createDataFrame(trees, Tree.class);
+```
+
+```java
+df.printSchema();
+```
+
+```text
+root
+ |-- adresse: string (nullable = true)
+ |-- circonfere: string (nullable = true)
+ |-- dateplanta: string (nullable = true)
+ |-- espece: string (nullable = true)
+ |-- geom_x_y: string (nullable = true)
+ |-- hauteurenm: float (nullable = false)
+ |-- varieteouc: string (nullable = true)
+```
+
+```java
+df.show();
+```
+
+```text
+adresse              circonfere dateplanta espece               geom_x_y             hauteurenm varieteouc    
+COURS ALBERT 1ER     140.0                 Aesculus hippocas... 48.8648454814, 2.... 10.0                     
+PLACE DES TERNES     100.0                 Tilia platyphyllos   48.8782668139, 2.... 15.0                     
+BOULEVARD MALESHE... 38.0                  Platanus x hispanica 48.889306184, 2.3... 0.0                      
+QUAI BRANLY          65.0       1996-02-29 Paulownia tomentosa  48.8599934405, 2.... 10.0                     
+```
+
+---
+
+# DataFrames - DSL
+
+Count trees by species
+
+```java
+DataFrame df = sqlContext.createDataFrame(trees, Tree.class);
+df
+    .select(df.col("espece"))
+    .where(df.col("espece").notEqual(""))
+    .groupBy(df.col("espece"))
+    .agg(Collections.singletonMap("*", "count"))
+    .sort("espece")
+    .show();
+```
+
+```text
+espece               COUNT(1)
+Acacia dealbata      2       
+Acer acerifolius     39      
+Acer buergerianum    14      
+Acer campestre       452     
+Acer cappadocicum    111     
+...
+```
+
+---
+
+class: center, middle, lab
+
+# Lab - Data exploration
+
+---
+
+# 1 - Compute the average age
+
+- Class `fr.ippon.dojo.spark.exploration.dataframes.AverageAge`
+- Steps
+  - load the CSV file using Spark CSV
+  - aggregate the age using the `org.apache.spark.sql.functions.avg()` function
+  - print the results
+
+---
+
+# 2 - List distinct jobs
+
+- Class `fr.ippon.dojo.spark.exploration.dataframes.ListDistinctJobs`
+- Steps
+  - load the CSV file using Spark CSV
+  - select the "job" column
+  - sort by the "job" column
+  - remove duplicates
+  - print the results
+
+---
+
+# 3 - Average age by marital status
+
+- Class `fr.ippon.dojo.spark.exploration.dataframes.AverageAgeByMaritalStatus`
+- Steps
+  - group by the "martial" column
+  - aggregate the age using the org.apache.spark.sql.functions.avg() function
+  - print the results
+
+---
+
+# 4 - Wikipedia
+
+2 datasets:
+
+- Wikipedia page stats
+  - One file per hour
+  - One line per page with url + number of views
+- Page names of the "Football Worldcup" page
+  - One line per site (country)
+
+---
+
+# 4 - Wikipedia
+
+- Class `fr.ippon.dojo.spark.exploration.dataframes.WikipediaWorldcup`
+- Steps
+  - prepare the schema for viewing stats
+  - load the CSV file of viewing stats
+  - prepare the schema for page names
+  - load the CSV file of page names
+  - join both dataframes on site and url columns
+  - select the "language", "pagename" and "views" columns
+  - group by the "language" and "views" columns
+  - aggregate the "views" using the org.apache.spark.sql.functions.sum() function
+  - sort the results
+  - print the results
+
+---
+
+class: center, middle, section
+
+# Spark SQL
+
+---
+
+# Spark SQL
+
+- Query DataFrames using SQL
+- SQL engine (**Catalyst**): converts queries into lower-lever instructions
+
+---
+
+# Spark SQL
+
+Count trees by species
+
+```sql
+sqlContext.sql("SELECT espece, COUNT(*)
+                FROM tree
+                WHERE espece &lt;&gt; ''
+                GROUP BY espece
+                ORDER BY espece")
+          .show();
+```
+
+```text
+espece               c1   
+Acacia dealbata      2    
+Acer acerifolius     39   
+Acer buergerianum    14   
+Acer campestre       452  
+Acer cappadocicum    111
+...  
+```
+
+---
+
+class: center, middle, lab
+
+# Lab - Data exploration
+
+---
+
+# 1 - Wikipedia
+
+- Class `fr.ippon.dojo.spark.exploration.dataframes.WikipediaWorldcup`
+- Steps
+  - prepare the schema for viewing stats
+  - load the CSV file of viewing stats
+  - **register the dataframe as a table**
+  - prepare the schema for page names
+  - load the CSV file of page names
+  - **register the dataframe as a table**
+  - **perform the SQL request**
+  - print the results
+
+---
+
 class: center, middle, section
 
 # Machine Learning

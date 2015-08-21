@@ -12,6 +12,7 @@ object ListDistinctJobs extends App {
   val sc = new SparkContext(conf)
   val sqlContext = new SQLContext(sc)
 
+  // - load the CSV file
   val lines = sqlContext.read.format("com.databricks.spark.csv")
     .option("header", "true")
     .option("delimiter", ";")
@@ -21,9 +22,12 @@ object ListDistinctJobs extends App {
   lines.printSchema()
   lines.show()
 
-  lines.select("job")
-    .sort("job")
-    .distinct
-    .show()
+  // - select the "job" column
+
+  // - sort by the "job" column
+
+  // - remove duplicates
+
+  // - print the results
 
 }

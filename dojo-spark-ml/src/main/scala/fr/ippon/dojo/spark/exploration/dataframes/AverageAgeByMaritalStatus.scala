@@ -12,6 +12,7 @@ object AverageAgeByMaritalStatus extends App {
   val sc = new SparkContext(conf)
   val sqlContext = new SQLContext(sc)
 
+  // - load the CSV file
   val lines = sqlContext.read.format("com.databricks.spark.csv")
     .option("header", "true")
     .option("delimiter", ";")
@@ -21,8 +22,10 @@ object AverageAgeByMaritalStatus extends App {
   lines.printSchema()
   lines.show()
 
-  val avgAge = lines.groupBy("marital")
-    .agg(avg("age"))
-    .show()
+  // - group by the "martial" column
+
+  // - aggregate the age using the org.apache.spark.sql.functions.avg() function
+
+  // - print the results
 
 }

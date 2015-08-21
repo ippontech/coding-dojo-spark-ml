@@ -1,7 +1,6 @@
 package fr.ippon.dojo.spark.exploration.dataframes
 
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.functions._
 import org.apache.spark.{SparkConf, SparkContext}
 
 object AverageAge extends App {
@@ -12,6 +11,7 @@ object AverageAge extends App {
   val sc = new SparkContext(conf)
   val sqlContext = new SQLContext(sc)
 
+  // - load the CSV file
   val lines = sqlContext.read.format("com.databricks.spark.csv")
     .option("header", "true")
     .option("delimiter", ";")
@@ -21,7 +21,8 @@ object AverageAge extends App {
   lines.printSchema()
   lines.show()
 
-  val avgAge = lines.agg(avg("age"))
-    .show()
+  // - aggregate the age using the org.apache.spark.sql.functions.avg() function
+
+  // - print the results
 
 }
