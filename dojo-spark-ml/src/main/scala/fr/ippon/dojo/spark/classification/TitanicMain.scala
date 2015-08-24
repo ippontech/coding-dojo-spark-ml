@@ -1,8 +1,5 @@
 package fr.ippon.dojo.spark.classification
 
-import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.classification.RandomForestClassifier
-import org.apache.spark.ml.feature._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, StringType}
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -93,6 +90,27 @@ object TitanicMain {
     //      .groupBy("Survived", "prediction")
     //      .agg(count("*"))
     //      .show()
+
+
+    //////// Optional: try adding a feature
+
+    // - calculate the most frequent "Embarked" value
+    //val mostFrequentEmbarked = calcMostFrequentEmbarked(rawTraining, "Embarked")
+
+    // - fill in missing "Embarked" values with the most frequent value (training+test dataset)
+    //val trainingTemp2 = fillMissingEmbarked(trainingTemp1, "Embarked", "Embarked_cleaned", mostFrequentEmbarked)
+    //val testTemp2 = fillMissingEmbarked(testTemp1, "Embarked", "Embarked_cleaned", mostFrequentEmbarked)
+
+    // - create a StringIndexer to transform the "Embarked_cleaned" column to a numeric column "Embarked_indexed"
+    //val embarkedIndexer = new StringIndexer().setInputCol("Embarked_cleaned").setOutputCol("Embarked_indexed")
+
+    // - create a OneHotEncoder to transform the "Embarked_indexed" column to a vector column "Embarked_encoded"
+    //val embarkedEncoder = new OneHotEncoder().setInputCol("Embarked_indexed").setOutputCol("Embarked_encoded")
+
+    // - add the "Embarked_encoded" column to the VectorAssembler
+
+    // - train, apply the model, and compare the results
+
 
 
   }
