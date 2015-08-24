@@ -99,6 +99,8 @@ class: center, middle, section
 
 ---
 
+<img src="img/hadoop-elephant.png" width="40%" style="float:right"/>
+
 # Proximity with Hadoop
 
 - Same use cases
@@ -117,7 +119,7 @@ class: center, middle, section
 
 # Faster than Hadoop
 
-Spark officially sets a new record in large-scale sorting (5th November 2014)
+*"Spark officially sets a new record in large-scale sorting"* (5th November 2014)
 
 - Sorting 100 To of data
 - **Hadoop MR: 72 minutes**
@@ -144,8 +146,13 @@ http://databricks.com/blog/2014/11/05/spark-officially-sets-a-new-record-in-larg
 
 - Yarn, Zookeeper, Mesos
 - HDFS
-- Cassandra, Elasticsearch, MongoDB
-- Notebooks: Zeppelin, Spark Notebook...
+- Databases:
+  - Cassandra
+  - Elasticsearch
+  - MongoDB
+- Notebooks:
+  - Zeppelin
+  - Spark Notebook
 
 ---
 
@@ -224,16 +231,16 @@ geom_x_y;circonfere;adresse;hauteurenm;espece;varieteouc;dateplanta
 
 # Example
 
-```java
-JavaSparkContext sc = new JavaSparkContext("local", "arbres");
+```scala
+val sc = new SparkContext("local", "arbres")
 
 sc.textFile("data/arbresalignementparis2010.csv")
-        .filter(line -> !line.startsWith("geom"))
-        .map(line -> line.split(";"))
-        .mapToPair(fields -> new Tuple2<String, Integer>(fields[4], 1))
-        .reduceByKey((x, y) -> x + y)
-        .sortByKey()
-        .foreach(t -> System.out.println(t._1 + " : " + t._2));
+  .filter(line => !line.startsWith("geom"))
+  .map(line => line.split(";"))
+  .map(fields => (fields(4), 1))
+  .reduceByKey((x, y) => x + y)
+  .sortByKey()
+  .foreach(t => println(t._1 + " : " + t._2))
 ```
 
 <img src="img/rdd_example.png" width="100%">
@@ -251,10 +258,12 @@ class: center, middle, lab
 - List of potential clients along with:
   - some demographics
   - other characteristics
-  - whether they subscribed a bank product
+  - whether they subscribed to a bank product
 - CSV file: `src/main/resources/banking-full.csv`
 
 <img src="img/data_banking.png" width="100%">
+
+Source: https://archive.ics.uci.edu/ml/datasets/Bank+Marketing
 
 ---
 
@@ -339,7 +348,7 @@ Prerequisite:
 
 Description of the schema:
 
-- Programmatic description of the data
+- Programmatic description
 - Inference through reflection (POJO)
 
 ---
@@ -350,16 +359,19 @@ Create tabular data
 
 - Type Row
 
-```java
-JavaRDD<Row> rdd = trees.map(fields -> Row.create(
-        Float.parseFloat(fields[3]), fields[4]));
+```scala
+val rdd: RDD[Row] = trees.map(
+  fields => Row(fields(3).toFloat, fields(4))
+)
 ```
 
 - Custom type
 
-```java
-JavaRDD<Row> rdd = trees.map(fields -> Row.create(
-        Float.parseFloat(fields[3]), fields[4]));
+```scala
+case class Tree(height: Float, specie: String)
+val rdd: RDD[Tree] = trees.map(
+  fields => Tree(fields(3).toFloat, fields(4))
+)
 ```
 
 ```text
@@ -375,12 +387,12 @@ JavaRDD<Row> rdd = trees.map(fields -> Row.create(
 
 # DataFrames - Schema inference
 
-```java
-DataFrame df = sqlContext.createDataFrame(trees, Tree.class);
+```scala
+val df: DataFrame = sqlContext.createDataFrame(trees, classOf[Tree])
 ```
 
-```java
-df.printSchema();
+```scala
+df.printSchema()
 ```
 
 ```text
@@ -394,8 +406,8 @@ root
  |-- varieteouc: string (nullable = true)
 ```
 
-```java
-df.show();
+```scala
+df.show()
 ```
 
 ```text
@@ -412,15 +424,15 @@ QUAI BRANLY          65.0       1996-02-29 Paulownia tomentosa  48.8599934405, 2
 
 Count trees by species
 
-```java
-DataFrame df = sqlContext.createDataFrame(trees, Tree.class);
+```scala
+val df: DataFrame = sqlContext.createDataFrame(trees)
 df
-    .select(df.col("espece"))
-    .where(df.col("espece").notEqual(""))
-    .groupBy(df.col("espece"))
-    .agg(Collections.singletonMap("*", "count"))
-    .sort("espece")
-    .show();
+  .select("specie")
+  .where(df("specie").notEqual(""))
+  .groupBy("specie")
+  .agg(functions.count("*"))
+  .orderBy("specie")
+  .show()
 ```
 
 ```text
@@ -468,7 +480,7 @@ class: center, middle, lab
 - Class `fr.ippon.dojo.spark.exploration.dataframes.AverageAgeByMaritalStatus`
 - Steps
   - group by the "martial" column
-  - aggregate the age using the org.apache.spark.sql.functions.avg() function
+  - aggregate the age using the `org.apache.spark.sql.functions.avg()` function
   - print the results
 
 ---
@@ -496,7 +508,7 @@ class: center, middle, lab
   - join both dataframes on site and url columns
   - select the "language", "pagename" and "views" columns
   - group by the "language" and "views" columns
-  - aggregate the "views" using the org.apache.spark.sql.functions.sum() function
+  - aggregate the "views" using the `org.apache.spark.sql.functions.sum()` function
   - sort the results
   - print the results
 
@@ -511,21 +523,29 @@ class: center, middle, section
 # Spark SQL
 
 - Query DataFrames using SQL
-- SQL engine (**Catalyst**): converts queries into lower-lever instructions
+- SQL engine (**Catalyst**):
+  - Converts queries into lower-lever instructions
+  - May re-arrange the execution tree
 
 ---
 
 # Spark SQL
 
-Count trees by species
+Register a `DataFrame` as a table:
 
-```sql
-sqlContext.sql("SELECT espece, COUNT(*)
-                FROM tree
-                WHERE espece &lt;&gt; ''
-                GROUP BY espece
-                ORDER BY espece")
-          .show();
+```scala
+df.registerTempTable("tree")
+```
+
+Count trees by species:
+
+```scala
+sqlContext.sql(
+  """SELECT specie, COUNT(*)
+    |FROM tree
+    |WHERE specie &lt;&gt; ''
+    |GROUP BY specie
+    |ORDER BY specie""".stripMargin)
 ```
 
 ```text
@@ -546,7 +566,7 @@ class: center, middle, lab
 
 ---
 
-# 1 - Wikipedia
+# Wikipedia
 
 - Class `fr.ippon.dojo.spark.exploration.dataframes.WikipediaWorldcup`
 - Steps
@@ -694,6 +714,93 @@ Build clusters of points based on similarities
 
 ---
 
+# Spark ML Pipelines
+
+- Pipeline = Transformers + Estimator
+- Call `pipeline.fit()` to train a model
+
+<img src="img/pipeline_fit.png" width="65%">
+
+- Call `model.transform()` to apply the model
+
+<img src="img/pipeline_transform.png" width="65%">
+
+---
+
+class: center, middle, lab
+
+# Lab - Titanic
+
+---
+
+# Titanic
+
+- List of passengers + survived?
+- Can we predict whether passenger will survive?
+
+---
+
+# Training dataset
+
+- Characteristics + Survived
+
+<img src="img/titanic_training.png" width="100%">
+
+---
+
+# Test dataset
+
+- Characteristics only
+
+<img src="img/titanic_test.png" width="100%">
+
+---
+
+# Expected results dataset
+
+- Passenger ID (from the test dataset) + Survived
+
+<img src="img/titanic_expected.png" width="20%">
+
+---
+
+# Data Cleansing
+
+Age:
+
+- Some missing values for the age
+- Replace with the mean age
+
+Embarked _(we will not use it)_:
+
+- Some missing values for the "Embarked" value
+- Replace with the most frequent value
+
+---
+
+# Feature Engineering
+
+Survived:
+
+- Needs to be _indexed_ (i.e. converted to Double + known values listed as metadata of the column)
+- The new column will become the **label** column
+
+Sex:
+
+- Needs to be _indexed_
+
+Embarked _(we will not use it)_:
+
+- Should be _indexed_ then _one hot encoded_ (i.e. converted to a vector of booleans)
+
+---
+
+# Lab
+
+- Random forests: `RandomForestClassifier`
+
+---
+
 class: center, middle, lab
 
 # Lab 1.1 - Linear Regression
@@ -814,19 +921,6 @@ class: center, middle, lab
 Predict whether the person will purchase a subscription ("y") from other characteristics
 
 <img src="img/data_bank.png" width="100%">
-
----
-
-# Spark ML Pipelines
-
-- Pipeline = Transformers + Estimator
-- Call `pipeline.fit()` to train a model
-
-<img src="img/pipeline_fit.png" width="65%">
-
-- Call `model.transform()` to apply the model
-
-<img src="img/pipeline_transform.png" width="65%">
 
 ---
 
