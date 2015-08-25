@@ -1,20 +1,10 @@
 package fr.ippon.dojo.spark.cassandra
 
-import com.datastax.spark.connector._
 import org.apache.spark.SparkContext
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import org.apache.spark.sql.{Row, SQLContext, SaveMode}
-
-case class Movie(movie_id: Int,
-                 title: String,
-                 avg_rating: Double,
-                 total_ratings: Int,
-                 //release_date: String,
-                 //video_release_date: String,
-                 //imdb_url: String,
-                 genres: Set[String])
 
 object MoviesLoader {
 
@@ -26,6 +16,9 @@ object MoviesLoader {
     // Children's | Comedy | Crime | Documentary | Drama | Fantasy |
     // Film-Noir | Horror | Musical | Mystery | Romance | Sci-Fi |
     // Thriller | War | Western |
+
+
+    // --- load the CSV file
 
     val schema = StructType(
       Array(
@@ -63,7 +56,75 @@ object MoviesLoader {
       .schema(schema)
       .load("src/main/resources/ml-100k/u.item")
 
+      .drop("release_date")
+      .drop("video_release_date")
+      .drop("imdb_url")
+
     moviesDF.show()
+
+
+    // --- convert the boolean columns of the genres into a set of genre names
+
+    val genresBroadcast: Broadcast[Array[String]] = sc.broadcast(genresList)
+
+    sqlContext.udf.register("getGenres",
+      (genreUnknown: String, genreAction: String, genreAdventure: String, genreAnimation: String,
+       genreChildren: String, genreComedy: String, genreCrime: String, genreDocumentary: String,
+       genreDrama: String, genreFantasy: String, genreFilmNoir: String, genreHorror: String,
+       genreMusical: String, genreMystery: String, genreRomance: String, genreSciFi: String,
+       genreThriller: String, genreWar: String, genreWestern: String)
+      => getGenres(genreUnknown, genreAction, genreAdventure, genreAnimation,
+        genreChildren, genreComedy, genreCrime, genreDocumentary,
+        genreDrama, genreFantasy, genreFilmNoir, genreHorror,
+        genreMusical, genreMystery, genreRomance, genreSciFi,
+        genreThriller, genreWar, genreWestern,
+        genresBroadcast))
+
+    val moviesWithGenresDF = moviesDF
+      .withColumn("genres",
+        callUdf("getGenres",
+          moviesDF("genreUnknown"),
+          moviesDF("genreAction"),
+          moviesDF("genreAdventure"),
+          moviesDF("genreAnimation"),
+          moviesDF("genreChildren"),
+          moviesDF("genreComedy"),
+          moviesDF("genreCrime"),
+          moviesDF("genreDocumentary"),
+          moviesDF("genreDrama"),
+          moviesDF("genreFantasy"),
+          moviesDF("genreFilmNoir"),
+          moviesDF("genreHorror"),
+          moviesDF("genreMusical"),
+          moviesDF("genreMystery"),
+          moviesDF("genreRomance"),
+          moviesDF("genreSciFi"),
+          moviesDF("genreThriller"),
+          moviesDF("genreWar"),
+          moviesDF("genreWestern")
+        ))
+      .drop("genreUnknown")
+      .drop("genreAction")
+      .drop("genreAdventure")
+      .drop("genreAnimation")
+      .drop("genreChildren")
+      .drop("genreComedy")
+      .drop("genreCrime")
+      .drop("genreDocumentary")
+      .drop("genreDrama")
+      .drop("genreFantasy")
+      .drop("genreFilmNoir")
+      .drop("genreHorror")
+      .drop("genreMusical")
+      .drop("genreMystery")
+      .drop("genreRomance")
+      .drop("genreSciFi")
+      .drop("genreThriller")
+      .drop("genreWar")
+      .drop("genreWestern")
+
+
+    // --- incorporate the ratings
 
     val ratingsDF = RatingsLoader.readRatings()
       .groupBy("movie_id")
@@ -71,38 +132,50 @@ object MoviesLoader {
 
     ratingsDF.show()
 
-    val moviesWithRatingsDF = moviesDF.join(ratingsDF, "movie_id")
+    val moviesWithGenresAndRatings = moviesWithGenresDF.join(ratingsDF, "movie_id")
 
-    moviesWithRatingsDF.show()
+    moviesWithGenresAndRatings.show()
 
 
-    val genresWithIndex: Array[(String, Int)] = genresList.zipWithIndex
-      .map(t => (t._1, t._2 + IndexOfFirstGenre))
-    val genresBroadcast: Broadcast[Array[(String, Int)]] = sc.broadcast(genresWithIndex)
+    // --- save to Cassandra
 
-    moviesWithRatingsDF.map(row => MoviesFunctions.createMovie(row, genresBroadcast))
-      .saveToCassandra("movielens", "movies")
+    moviesWithGenresAndRatings.write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("keyspace" -> "movielens", "table" -> "movies"))
+      .mode(SaveMode.Append)
+      .save()
 
   }
 
-}
+  def getGenres(genreUnknown: String,
+                genreAction: String,
+                genreAdventure: String,
+                genreAnimation: String,
+                genreChildren: String,
+                genreComedy: String,
+                genreCrime: String,
+                genreDocumentary: String,
+                genreDrama: String,
+                genreFantasy: String,
+                genreFilmNoir: String,
+                genreHorror: String,
+                genreMusical: String,
+                genreMystery: String,
+                genreRomance: String,
+                genreSciFi: String,
+                genreThriller: String,
+                genreWar: String,
+                genreWestern: String,
+                genresBroadcast: Broadcast[Array[String]]): Seq[String] = {
 
-object MoviesFunctions {
+    val bools = Seq(genreUnknown, genreAction, genreAdventure, genreAnimation, genreChildren, genreComedy,
+      genreCrime, genreDocumentary, genreDrama, genreFantasy, genreFilmNoir, genreHorror, genreMusical,
+      genreMystery, genreRomance, genreSciFi, genreThriller, genreWar, genreWestern)
+      .map(s => if (s == "1") true else false)
 
-  def createMovie(row: Row, genresWithIndex: Broadcast[Array[(String, Int)]]): Movie = {
-
-    val genres = genresWithIndex.value
-      .map(t => (t._1, row.getString(t._2)))
-      .filter(t => t._2 == "1")
-      .map(t => t._1)
-      .toSet
-
-    Movie(row.getInt(0),
-      row.getString(1),
-      row.getDouble(row.length - 2),
-      row.getLong(row.length - 1).toInt,
-      genres
-    )
+    genresBroadcast.value.zip(bools)
+      .filter(_._2)
+      .map(_._1)
   }
 
 }

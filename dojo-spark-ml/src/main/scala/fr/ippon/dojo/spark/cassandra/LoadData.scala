@@ -17,7 +17,7 @@ object LoadData {
 
     val genresList = GenresLoader.loadGenres()
 
-//    RatingsLoader.loadRatings()
+    RatingsLoader.loadRatings()
 
     MoviesLoader.loadMovies(genresList)
 
