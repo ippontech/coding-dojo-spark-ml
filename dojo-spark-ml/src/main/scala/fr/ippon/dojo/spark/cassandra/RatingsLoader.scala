@@ -1,16 +1,8 @@
 package fr.ippon.dojo.spark.cassandra
 
-import com.datastax.spark.connector._
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, SQLContext}
-
-case class Rating(
-                   user_id: Int,
-                   movie_id: Int,
-                   rating: Float,
-                   ts: Long
-                   )
+import org.apache.spark.sql.{SaveMode, DataFrame, SQLContext}
 
 object RatingsLoader {
 
@@ -38,17 +30,19 @@ object RatingsLoader {
   }
 
   def loadRatings()(implicit sc: SparkContext, sqlContext: SQLContext) = {
-    val ratingsDF = readRatings()
+    val ratings = readRatings()
 
-    val ratingsRDD = ratingsDF.map(row => Rating(
-      user_id = row.getInt(0),
-      movie_id = row.getInt(1),
-      rating = row.getInt(2),
-      ts = row.getLong(3)
-    ))
+    ratings.write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("keyspace" -> "movielens", "table" -> "ratings_by_movie"))
+      .mode(SaveMode.Append)
+      .save()
 
-    ratingsRDD.saveToCassandra("movielens", "ratings_by_movie")
-    ratingsRDD.saveToCassandra("movielens", "ratings_by_user")
+    ratings.write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("keyspace" -> "movielens", "table" -> "ratings_by_user"))
+      .mode(SaveMode.Append)
+      .save()
   }
 
 }
