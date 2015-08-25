@@ -5,7 +5,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
-import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.sql.{Row, SQLContext, SaveMode}
 
 case class Movie(movie_id: Int,
                  title: String,
@@ -91,8 +91,6 @@ object MoviesFunctions {
 
   def createMovie(row: Row, genresWithIndex: Broadcast[Array[(String, Int)]]): Movie = {
 
-
-
     val genres = genresWithIndex.value
       .map(t => (t._1, row.getString(t._2)))
       .filter(t => t._2 == "1")
@@ -101,8 +99,8 @@ object MoviesFunctions {
 
     Movie(row.getInt(0),
       row.getString(1),
-      0.0, //FIXME
-      0, //FIXME
+      row.getDouble(row.length - 2),
+      row.getLong(row.length - 1).toInt,
       genres
     )
   }
