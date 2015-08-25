@@ -15,6 +15,8 @@
         <hadoop.version>2.5.2</hadoop.version>
         <spark.version>1.4.1</spark.version>
         <spark-csv.version>1.2.0</spark-csv.version>
+        <spark.cassandra.connector.version>1.4.0-M3</spark.cassandra.connector.version>
+        <cassandra.connector.version>2.1.6</cassandra.connector.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jackson-databind.version>2.6.0-1</jackson-databind.version>
         <maven.compiler.plugin>3.0</maven.compiler.plugin>
@@ -98,6 +100,18 @@
             <groupId>org.joda</groupId>
             <artifactId>joda-convert</artifactId>
             <version>1.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.datastax.spark</groupId>
+            <artifactId>spark-cassandra-connector_${scala.dep.version}</artifactId>
+            <version>${spark.cassandra.connector.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+            <version>${cassandra.connector.version}</version>
         </dependency>
 
     </dependencies>
