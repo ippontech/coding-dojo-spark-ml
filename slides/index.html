@@ -247,6 +247,144 @@ sc.textFile("data/arbresalignementparis2010.csv")
 
 ---
 
+class: center, middle, section
+
+# Scala basics
+
+---
+
+# Declaring a variable
+
+```scala
+val someIntegerVariable: Int = 42
+
+val someIntegerVariable = 42
+```
+
+- Use the `val` keyword to create an immutable variable (cannot be re-assigned)
+- Use the `var` keyword to create a mutable variable
+- Type is placed **after** the name, followed by a colon
+- No semi-colon at the end of a line
+- Type can be omitted: type is inferred → still strongly-typed
+
+---
+
+# Declaring a function
+
+```scala
+def someFunction() {
+  ...
+}
+
+def someOtherFunction(): Boolean {
+  ...
+}
+
+def calcMeanAge(df: DataFrame, inputCol: String): Double = {
+  ...
+}
+```
+
+- Use the `def` keyword
+- Return type is at the end, between the colon and the equals signs
+  - Return type can be omitted if not returning anything
+- Arguments are in the form `argName: Type`
+
+---
+
+# Return-value of a function
+
+```scala
+def someFunction(): Int {
+  ...
+  42
+}
+
+def someOtherFunction(): Int {
+  val someVariable = 42
+  someVariable
+}
+```
+
+- No `return` keyword
+- The last statement is the return-value
+
+---
+
+# Class definition
+
+```scala
+class SomeClass {
+  def someFunction() = {
+    ...
+  }
+}
+```
+
+```scala
+val someInstance = new SomeClass()
+someInstance.someFunction()
+```
+
+- Use `class` to define a class
+- Use `new` to create an instance
+
+---
+
+# Object definition
+
+```scala
+object SomeObject {
+  def someFunction() = {
+    ...
+  }
+}
+```
+
+```scala
+SomeClass.someFunction()
+```
+
+- An object is a singleton
+- Use `object` to define an object
+- Call functions directly on the class name
+
+---
+
+# Tuples
+
+```scala
+val tupleWith2Values = ("some string", 42)
+val someString = tupleWith2Values._1
+
+val tupleWith3Values = ("some string", 42, true)
+val someBoolean = tupleWith2Values._3
+```
+
+- Use parentheses to define a tuple
+- Tuples can have as many 22 values
+- Tuples are strongly-typed
+- Use `_X` to access the Xth value
+
+---
+
+# Lambdas
+
+```scala
+  someRDD.filter(x => x > 0)
+
+  someRDD.filter(_ > 0)
+
+  someRDD.reduceByKey(_ + _)
+```
+
+- Arguments are placed before the `=>`
+- Arguments are stongly-typed but the type is omitted
+- The function is placed after the `=>`
+- In some cases, arguments and `=>` can be omitted: use `_` to refer to the arguments
+
+---
+
 class: center, middle, lab
 
 # Lab - Data exploration
@@ -680,11 +818,11 @@ Build clusters of points based on similarities
 # Machine Learning
 
 - Evaluate the performance of the model
-  - E.g.: ROC curve
+  - E.g.: Root Mean Square Error (RMSE), ROC curve...
 - Examine predictions
   - False positives, false negatives...
 
-<img src="img/roc_curve.png" width="250"> <img src="img/predictions.png" width="250">
+<img src="img/rmse.png" width="250" style="margin:5%"> <img src="img/predictions.png" width="250" style="margin:5%">
 
 ---
 
